@@ -13,6 +13,9 @@ const router = Router();
 // All routes require authentication
 router.use(authenticate);
 
+// Get interactions by customer ID
+router.get('/customer/:customerId', getByCustomerId);
+
 // Get interaction by ID
 router.get('/:id', getById);
 
@@ -24,8 +27,5 @@ router.put('/:id', update);
 
 // Delete interaction
 router.delete('/:id', remove);
-
-// Get interactions by customer ID
-router.get('/customer/:customerId', getByCustomerId);
 
 export default router;

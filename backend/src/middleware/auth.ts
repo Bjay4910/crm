@@ -17,7 +17,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   // Get token from header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Authorization denied' });
+    res.status(401).json({ message: 'Authorization denied' });
+    return;
   }
 
   const token = authHeader.split(' ')[1];
@@ -26,7 +27,8 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     // Verify token
     const decoded = verifyToken(token);
     if (!decoded) {
-      return res.status(401).json({ message: 'Token is not valid' });
+      res.status(401).json({ message: 'Token is not valid' });
+      return;
     }
 
     // Add user info to request
@@ -34,7 +36,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
       userId: decoded.userId,
       role: decoded.role
     };
-    
+
     next();
   } catch (err) {
     res.status(401).json({ message: 'Token is not valid' });
@@ -44,12 +46,14 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 // Middleware to check if user is admin
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return res.status(401).json({ message: 'Authorization denied' });
+    res.status(401).json({ message: 'Authorization denied' });
+    return;
   }
-  
+
   if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied' });
+    res.status(403).json({ message: 'Access denied' });
+    return;
   }
-  
+
   next();
 };
