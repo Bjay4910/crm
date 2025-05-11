@@ -144,28 +144,28 @@ export async function getAllCustomers(
     // Add filters
     if (filters.name) {
       query += ' AND name LIKE ?';
-      countQuery + ' AND name LIKE ?';
+      countQuery += ' AND name LIKE ?';
       queryParams.push(`%${filters.name}%`);
       countQueryParams.push(`%${filters.name}%`);
     }
-    
+
     if (filters.email) {
       query += ' AND email LIKE ?';
-      countQuery + ' AND email LIKE ?';
+      countQuery += ' AND email LIKE ?';
       queryParams.push(`%${filters.email}%`);
       countQueryParams.push(`%${filters.email}%`);
     }
-    
+
     if (filters.company) {
       query += ' AND company LIKE ?';
-      countQuery + ' AND company LIKE ?';
+      countQuery += ' AND company LIKE ?';
       queryParams.push(`%${filters.company}%`);
       countQueryParams.push(`%${filters.company}%`);
     }
-    
+
     if (filters.status) {
       query += ' AND status = ?';
-      countQuery + ' AND status = ?';
+      countQuery += ' AND status = ?';
       queryParams.push(filters.status);
       countQueryParams.push(filters.status);
     }

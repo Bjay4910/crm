@@ -50,7 +50,8 @@ export async function createUser(user: User): Promise<UserResponse | null> {
 export async function findUserByEmail(email: string): Promise<User | null> {
   const db = await getDatabase();
   try {
-    return db.get<User>('SELECT * FROM users WHERE email = ?', email);
+    const user = await db.get<User>('SELECT * FROM users WHERE email = ?', email);
+    return user || null;
   } catch (error) {
     console.error('Error finding user by email:', error);
     return null;
@@ -60,10 +61,11 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 export async function findUserById(id: number): Promise<UserResponse | null> {
   const db = await getDatabase();
   try {
-    return db.get<UserResponse>(
-      'SELECT id, username, email, role, created_at FROM users WHERE id = ?', 
+    const user = await db.get<UserResponse>(
+      'SELECT id, username, email, role, created_at FROM users WHERE id = ?',
       id
     );
+    return user || null;
   } catch (error) {
     console.error('Error finding user by ID:', error);
     return null;
