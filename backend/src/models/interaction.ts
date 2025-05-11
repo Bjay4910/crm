@@ -92,7 +92,7 @@ export async function updateInteraction(id: number, interaction: Partial<Interac
       [...values, id]
     );
     
-    return result.changes > 0;
+    return result.changes !== undefined && result.changes > 0;
   } catch (error) {
     console.error('Error updating interaction:', error);
     return false;
@@ -104,7 +104,7 @@ export async function deleteInteraction(id: number): Promise<boolean> {
   
   try {
     const result = await db.run('DELETE FROM interactions WHERE id = ?', id);
-    return result.changes > 0;
+    return result.changes !== undefined && result.changes > 0;
   } catch (error) {
     console.error('Error deleting interaction:', error);
     return false;

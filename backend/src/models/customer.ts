@@ -86,8 +86,8 @@ export async function updateCustomer(id: number, customer: Partial<Customer>): P
       `UPDATE customers SET ${updates.join(', ')} WHERE id = ?`,
       [...values, id]
     );
-    
-    return result.changes > 0;
+
+    return result.changes !== undefined && result.changes > 0;
   } catch (error) {
     console.error('Error updating customer:', error);
     return false;
@@ -118,7 +118,7 @@ export async function deleteCustomer(id: number): Promise<boolean> {
     
     // Then delete the customer
     const result = await db.run('DELETE FROM customers WHERE id = ?', id);
-    return result.changes > 0;
+    return result.changes !== undefined && result.changes > 0;
   } catch (error) {
     console.error('Error deleting customer:', error);
     return false;
@@ -137,7 +137,7 @@ export async function getAllCustomers(
   try {
     // Build query with filters
     let query = 'SELECT * FROM customers WHERE 1=1';
-    const countQuery = 'SELECT COUNT(*) as total FROM customers WHERE 1=1';
+    let countQuery = 'SELECT COUNT(*) as total FROM customers WHERE 1=1';
     const queryParams: any[] = [];
     let countQueryParams: any[] = [];
     
