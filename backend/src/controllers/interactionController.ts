@@ -26,7 +26,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     // Check if customer exists
     const customer = await getCustomerById(customer_id);
     if (!customer) {
-      return res.status(404).json({ message: 'Customer not found' });
+      res.status(404).json({ message: 'Customer not found' });
+      return;
     }
 
     // Create interaction
@@ -39,7 +40,8 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!interaction) {
-      return res.status(500).json({ message: 'Error creating interaction' });
+      res.status(500).json({ message: 'Error creating interaction' });
+      return;
     }
 
     res.status(201).json(interaction);
@@ -55,7 +57,8 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
     
     const interaction = await getInteractionById(id);
     if (!interaction) {
-      return res.status(404).json({ message: 'Interaction not found' });
+      res.status(404).json({ message: 'Interaction not found' });
+      return;
     }
 
     res.json(interaction);
@@ -68,7 +71,8 @@ export const getById = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
     }
 
     const id = parseInt(req.params.id);
@@ -77,12 +81,14 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     // Check if interaction exists
     const existingInteraction = await getInteractionById(id);
     if (!existingInteraction) {
-      return res.status(404).json({ message: 'Interaction not found' });
+      res.status(404).json({ message: 'Interaction not found' });
+      return;
     }
 
     // Verify ownership or admin status
     if (existingInteraction.user_id !== req.user.userId && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized to update this interaction' });
+      res.status(403).json({ message: 'Not authorized to update this interaction' });
+      return;
     }
 
     // Update interaction
@@ -93,7 +99,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!success) {
-      return res.status(500).json({ message: 'Error updating interaction' });
+      res.status(500).json({ message: 'Error updating interaction' });
+      return;
     }
 
     // Get updated interaction
@@ -108,7 +115,8 @@ export const update = async (req: Request, res: Response): Promise<void> => {
 export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
     }
 
     const id = parseInt(req.params.id);
@@ -116,18 +124,21 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
     // Check if interaction exists
     const existingInteraction = await getInteractionById(id);
     if (!existingInteraction) {
-      return res.status(404).json({ message: 'Interaction not found' });
+      res.status(404).json({ message: 'Interaction not found' });
+      return;
     }
 
     // Verify ownership or admin status
     if (existingInteraction.user_id !== req.user.userId && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Not authorized to delete this interaction' });
+      res.status(403).json({ message: 'Not authorized to delete this interaction' });
+      return;
     }
 
     // Delete interaction
     const success = await deleteInteraction(id);
     if (!success) {
-      return res.status(500).json({ message: 'Error deleting interaction' });
+      res.status(500).json({ message: 'Error deleting interaction' });
+      return;
     }
 
     res.json({ message: 'Interaction deleted successfully' });
