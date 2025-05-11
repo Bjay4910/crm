@@ -7,13 +7,14 @@ import {
   getAllCustomers 
 } from '../models/customer';
 
-export const create = async (req: Request, res: Response) => {
+export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, phone, company, status } = req.body;
 
     // Validate required fields
     if (!name) {
-      return res.status(400).json({ message: 'Name is required' });
+      res.status(400).json({ message: 'Name is required' });
+      return;
     }
 
     // Create customer
@@ -26,7 +27,8 @@ export const create = async (req: Request, res: Response) => {
     });
 
     if (!customer) {
-      return res.status(500).json({ message: 'Error creating customer' });
+      res.status(500).json({ message: 'Error creating customer' });
+      return;
     }
 
     res.status(201).json(customer);
@@ -36,7 +38,7 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-export const update = async (req: Request, res: Response) => {
+export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     const { name, email, phone, company, status } = req.body;
@@ -44,7 +46,8 @@ export const update = async (req: Request, res: Response) => {
     // Check if customer exists
     const existingCustomer = await getCustomerById(id);
     if (!existingCustomer) {
-      return res.status(404).json({ message: 'Customer not found' });
+      res.status(404).json({ message: 'Customer not found' });
+      return;
     }
 
     // Update customer
@@ -57,7 +60,8 @@ export const update = async (req: Request, res: Response) => {
     });
 
     if (!success) {
-      return res.status(500).json({ message: 'Error updating customer' });
+      res.status(500).json({ message: 'Error updating customer' });
+      return;
     }
 
     // Get updated customer
@@ -69,13 +73,14 @@ export const update = async (req: Request, res: Response) => {
   }
 };
 
-export const getById = async (req: Request, res: Response) => {
+export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     
     const customer = await getCustomerById(id);
     if (!customer) {
-      return res.status(404).json({ message: 'Customer not found' });
+      res.status(404).json({ message: 'Customer not found' });
+      return;
     }
 
     res.json(customer);
@@ -85,20 +90,22 @@ export const getById = async (req: Request, res: Response) => {
   }
 };
 
-export const remove = async (req: Request, res: Response) => {
+export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
-    
+
     // Check if customer exists
     const existingCustomer = await getCustomerById(id);
     if (!existingCustomer) {
-      return res.status(404).json({ message: 'Customer not found' });
+      res.status(404).json({ message: 'Customer not found' });
+      return;
     }
 
     // Delete customer
     const success = await deleteCustomer(id);
     if (!success) {
-      return res.status(500).json({ message: 'Error deleting customer' });
+      res.status(500).json({ message: 'Error deleting customer' });
+      return;
     }
 
     res.json({ message: 'Customer deleted successfully' });
@@ -108,7 +115,7 @@ export const remove = async (req: Request, res: Response) => {
   }
 };
 
-export const getAll = async (req: Request, res: Response) => {
+export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     // Parse query parameters
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;

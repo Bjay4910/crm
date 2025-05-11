@@ -8,17 +8,19 @@ import {
 } from '../models/interaction';
 import { getCustomerById } from '../models/customer';
 
-export const create = async (req: Request, res: Response) => {
+export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
     }
 
     const { customer_id, type, description, date } = req.body;
 
     // Validate required fields
     if (!customer_id || !type || !description) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
     }
 
     // Check if customer exists
@@ -47,7 +49,7 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-export const getById = async (req: Request, res: Response) => {
+export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     
@@ -63,7 +65,7 @@ export const getById = async (req: Request, res: Response) => {
   }
 };
 
-export const update = async (req: Request, res: Response) => {
+export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -103,7 +105,7 @@ export const update = async (req: Request, res: Response) => {
   }
 };
 
-export const remove = async (req: Request, res: Response) => {
+export const remove = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -135,14 +137,15 @@ export const remove = async (req: Request, res: Response) => {
   }
 };
 
-export const getByCustomerId = async (req: Request, res: Response) => {
+export const getByCustomerId = async (req: Request, res: Response): Promise<void> => {
   try {
     const customerId = parseInt(req.params.customerId);
     
     // Check if customer exists
     const customer = await getCustomerById(customerId);
     if (!customer) {
-      return res.status(404).json({ message: 'Customer not found' });
+      res.status(404).json({ message: 'Customer not found' });
+      return;
     }
     
     // Parse query parameters
