@@ -2,19 +2,21 @@ import { Request, Response } from 'express';
 import { createUser, findUserByEmail, validatePassword, UserResponse } from '../models/user';
 import { generateToken } from '../config/auth';
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password } = req.body;
 
     // Simple validation
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Please enter all fields' });
+      res.status(400).json({ message: 'Please enter all fields' });
+      return;
     }
 
     // Check if user already exists
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      res.status(400).json({ message: 'User already exists' });
+      return;
     }
 
     // Create new user
@@ -26,7 +28,8 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (!newUser) {
-      return res.status(500).json({ message: 'Error creating user' });
+      res.status(500).json({ message: 'Error creating user' });
+      return;
     }
 
     // Generate JWT token
@@ -47,25 +50,28 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
     // Simple validation
     if (!email || !password) {
-      return res.status(400).json({ message: 'Please enter all fields' });
+      res.status(400).json({ message: 'Please enter all fields' });
+      return;
     }
 
     // Check if user exists
     const user = await findUserByEmail(email);
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      res.status(400).json({ message: 'Invalid credentials' });
+      return;
     }
 
     // Validate password
     const isMatch = await validatePassword(user, password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      res.status(400).json({ message: 'Invalid credentials' });
+      return;
     }
 
     // Generate JWT token
@@ -87,12 +93,13 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const getCurrentUser = async (req: Request, res: Response) => {
+export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: 'Not authenticated' });
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
     }
-    
+
     res.json({
       user: {
         id: req.user.userId,
