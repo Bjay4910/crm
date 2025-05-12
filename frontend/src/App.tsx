@@ -47,7 +47,7 @@ function App() {
               <Button 
                 variant="contained" 
                 color="primary"
-                onClick={() => window.location.href = 'http://localhost:5000/health'}
+                onClick={() => window.location.href = 'http://localhost:8000/health'}
               >
                 Check Backend Health
               </Button>

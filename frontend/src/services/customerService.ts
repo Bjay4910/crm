@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { authHeader } from './authService';
 
-const API_URL = 'http://localhost:5000/api/customers';
+const API_URL = 'http://localhost:8000/api/customers';
 
 export interface Customer {
   id?: number;
