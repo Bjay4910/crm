@@ -6,41 +6,41 @@ import {
   Toolbar,
   Typography,
   Drawer,
-  IconButton,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  IconButton,
   Divider,
   Avatar,
   Menu,
   MenuItem,
-  useMediaQuery,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
-  Menu as MenuIcon,
   Dashboard as DashboardIcon,
   People as PeopleIcon,
+  Menu as MenuIcon,
   ExitToApp as LogoutIcon,
-  AccountCircle
+  Person as PersonIcon
 } from '@mui/icons-material';
-import { useAuth } from '../utils/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
-const drawerWidth = 240;
+const DRAWER_WIDTH = 240;
 
 const DashboardLayout: React.FC = () => {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const [drawerOpen, setDrawerOpen] = useState(!isMobile);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { currentUser, logout } = useAuth();
+  
   const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
+    setMobileOpen(!mobileOpen);
   };
   
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -54,6 +54,7 @@ const DashboardLayout: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+    handleProfileMenuClose();
   };
   
   const menuItems = [
@@ -62,18 +63,18 @@ const DashboardLayout: React.FC = () => {
   ];
   
   const drawer = (
-    <>
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography variant="h6" noWrap component="div">
+    <div>
+      <Toolbar sx={{ justifyContent: 'center' }}>
+        <Typography variant="h6" noWrap>
           CRM System
         </Typography>
-      </Box>
+      </Toolbar>
       <Divider />
       <List>
         {menuItems.map((item) => (
-          <ListItem
-            button
-            key={item.text}
+          <ListItem 
+            button 
+            key={item.text} 
             onClick={() => navigate(item.path)}
             selected={location.pathname === item.path}
             sx={{
@@ -90,7 +91,7 @@ const DashboardLayout: React.FC = () => {
           </ListItem>
         ))}
       </List>
-    </>
+    </div>
   );
   
   return (
@@ -98,9 +99,8 @@ const DashboardLayout: React.FC = () => {
       <AppBar
         position="fixed"
         sx={{
-          width: { md: `calc(100% - ${drawerOpen ? drawerWidth : 0}px)` },
-          ml: { md: `${drawerOpen ? drawerWidth : 0}px` },
-          zIndex: (theme) => theme.zIndex.drawer + 1
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { sm: `${DRAWER_WIDTH}px` }
         }}
       >
         <Toolbar>
@@ -109,22 +109,20 @@ const DashboardLayout: React.FC = () => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {/* Page title based on route */}
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {location.pathname.includes('/dashboard') && 'Dashboard'}
             {location.pathname.includes('/customers') && 'Customers'}
           </Typography>
           
           {currentUser && (
-            <Box>
+            <div>
               <IconButton
-                size="large"
-                edge="end"
                 aria-label="account of current user"
+                aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleProfileMenuOpen}
                 color="inherit"
@@ -134,53 +132,58 @@ const DashboardLayout: React.FC = () => {
                 </Avatar>
               </IconButton>
               <Menu
+                id="menu-appbar"
                 anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
                 open={Boolean(anchorEl)}
                 onClose={handleProfileMenuClose}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
                 <MenuItem disabled>
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant="body1">{currentUser.username}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {currentUser.email}
-                    </Typography>
-                  </Box>
+                  <Typography variant="body2">
+                    {currentUser.email}
+                  </Typography>
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={handleProfileMenuClose}>
                   <ListItemIcon>
-                    <AccountCircle fontSize="small" />
+                    <PersonIcon fontSize="small" />
                   </ListItemIcon>
-                  Profile
+                  <ListItemText>Profile</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
                     <LogoutIcon fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  <ListItemText>Logout</ListItemText>
                 </MenuItem>
               </Menu>
-            </Box>
+            </div>
           )}
         </Toolbar>
       </AppBar>
       
       <Box
         component="nav"
-        sx={{ width: { md: drawerOpen ? drawerWidth : 0 }, flexShrink: { md: 0 } }}
+        sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
         <Drawer
-          variant={isMobile ? 'temporary' : 'persistent'}
-          open={drawerOpen}
+          variant={isMobile ? 'temporary' : 'permanent'}
+          open={isMobile ? mobileOpen : true}
           onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted: true }}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile
+          }}
           sx={{
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-            },
+            display: { xs: 'block', sm: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH }
           }}
         >
           {drawer}
@@ -192,10 +195,8 @@ const DashboardLayout: React.FC = () => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { md: `calc(100% - ${drawerOpen ? drawerWidth : 0}px)` },
-          ml: { md: `${drawerOpen ? drawerWidth : 0}px` },
-          transition: 'margin 225ms cubic-bezier(0.0, 0, 0.2, 1) 0ms',
-          mt: '64px'
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          mt: { xs: 8, sm: 8 }
         }}
       >
         <Outlet />

@@ -1,5 +1,18 @@
 import React from 'react';
-import { createTheme, ThemeProvider, CssBaseline, Typography, Box, Button, Container, Paper } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+
+// Context
+import { AuthProvider } from './contexts/AuthContext';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardLayout from './layouts/DashboardLayout';
+
+// Pages
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
 
 // Create theme
 const theme = createTheme({
@@ -11,52 +24,40 @@ const theme = createTheme({
       main: '#f50057',
     },
   },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
 });
 
-function App() {
-  // Since we're having issues with imports, 
-  // let's display a simple placeholder screen
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md" sx={{ mt: 10 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-            <Typography variant="h3" component="h1" gutterBottom>
-              CRM System Prototype
-            </Typography>
-            <Typography variant="h5" color="textSecondary">
-              Welcome to the CRM system prototype!
-            </Typography>
-            <Typography variant="body1" align="center">
-              This is a simple CRM system with React frontend and Express backend.
-              The backend server is running on port 5000.
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1" fontWeight="bold">
-                Services available:
-              </Typography>
-              <ul>
-                <li>User authentication with JWT</li>
-                <li>Customer management</li>
-                <li>Interaction tracking</li>
-                <li>Dashboard with key metrics</li>
-              </ul>
-            </Box>
-            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-              <Button 
-                variant="contained" 
-                color="primary"
-                onClick={() => window.location.href = 'http://localhost:8000/health'}
-              >
-                Check Backend Health
-              </Button>
-            </Box>
-          </Box>
-        </Paper>
-      </Container>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                {/* Add other protected routes here */}
+              </Route>
+            </Route>
+            
+            {/* Redirect to dashboard if authenticated, otherwise to login */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;
