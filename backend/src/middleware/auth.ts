@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../config/auth';
+import { verifyAccessToken } from '../config/auth';
+import { AppError, catchAsync } from './errorHandler';
 
 // Extend Express Request interface to include user property
 declare global {
@@ -13,23 +14,19 @@ declare global {
   }
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
+// Authenticate middleware using our error handling system
+export const authenticate = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   // Get token from header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ message: 'Authorization denied' });
-    return;
+    throw new AppError('No token provided, authorization denied', 401);
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verify token
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      res.status(401).json({ message: 'Token is not valid' });
-      return;
-    }
+    // Verify access token
+    const decoded = verifyAccessToken(token);
 
     // Add user info to request
     req.user = {
@@ -39,21 +36,50 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
 
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token is not valid' });
+    // AppError from verifyAccessToken will be caught by our error handler
+    throw err;
   }
+});
+
+// Role-based access control middleware
+export const requireRole = (roles: string | string[]) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      throw new AppError('Not authenticated', 401);
+    }
+
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+    
+    if (!allowedRoles.includes(req.user.role)) {
+      throw new AppError(`Requires ${allowedRoles.join(' or ')} role`, 403);
+    }
+
+    next();
+  });
 };
 
-// Middleware to check if user is admin
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    res.status(401).json({ message: 'Authorization denied' });
-    return;
-  }
+// Shorthand middleware for common roles
+export const isAdmin = requireRole('admin');
+export const isManager = requireRole('manager');
+export const isUser = requireRole('user');
 
-  if (req.user.role !== 'admin') {
-    res.status(403).json({ message: 'Access denied' });
-    return;
-  }
+// Combined middleware for either admin or manager
+export const isAdminOrManager = requireRole(['admin', 'manager']);
 
-  next();
+// Resource ownership check middleware
+export const isResourceOwner = (extractUserId: (req: Request) => number) => {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      throw new AppError('Not authenticated', 401);
+    }
+
+    const resourceUserId = extractUserId(req);
+    
+    // Allow if user is the owner or an admin
+    if (req.user.userId === resourceUserId || req.user.role === 'admin') {
+      return next();
+    }
+    
+    throw new AppError('Not authorized to access this resource', 403);
+  });
 };

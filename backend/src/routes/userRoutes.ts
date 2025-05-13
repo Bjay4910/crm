@@ -1,16 +1,30 @@
 import { Router } from 'express';
-import { register, login, getCurrentUser } from '../controllers/userController';
+import { 
+  register, 
+  login, 
+  refreshToken, 
+  logout, 
+  logoutAllDevices, 
+  getCurrentUser, 
+  changePassword 
+} from '../controllers/userController';
 import { authenticate } from '../middleware/auth';
+import cookieParser from 'cookie-parser';
 
 const router = Router();
 
-// Register new user
+// Use cookie parser middleware
+router.use(cookieParser());
+
+// Public routes
 router.post('/register', register);
-
-// Login user
 router.post('/login', login);
+router.post('/refresh', refreshToken);
+router.post('/logout', logout);
 
-// Get current user
+// Protected routes
 router.get('/me', authenticate, getCurrentUser);
+router.post('/logout-all', authenticate, logoutAllDevices);
+router.post('/change-password', authenticate, changePassword);
 
 export default router;
