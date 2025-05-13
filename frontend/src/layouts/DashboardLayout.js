@@ -24,7 +24,8 @@ import {
   People as PeopleIcon,
   Menu as MenuIcon,
   ExitToApp as LogoutIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  CalendarToday as CalendarIcon
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -63,7 +64,8 @@ const DashboardLayout = () => {
   
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Customers', icon: <PeopleIcon />, path: '/customers' }
+    { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
+    { text: 'Calendar', icon: <CalendarIcon />, path: '/calendar' }
   ];
   
   const drawer = (
@@ -120,6 +122,7 @@ const DashboardLayout = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {location.pathname.includes('/dashboard') && 'Dashboard'}
             {location.pathname.includes('/customers') && 'Customers'}
+            {location.pathname.includes('/calendar') && 'Calendar'}
           </Typography>
           
           <div>

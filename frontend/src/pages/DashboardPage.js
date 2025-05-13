@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   Paper,
@@ -10,10 +11,13 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Button
 } from '@mui/material';
+import { CalendarToday as CalendarIcon } from '@mui/icons-material';
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState([]);
   
@@ -103,7 +107,17 @@ const DashboardPage = () => {
         
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2, height: '100%' }}>
-            <Typography variant="h6" gutterBottom>Recent Activities</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="h6">Recent Activities</Typography>
+              <Button
+                variant="outlined"
+                startIcon={<CalendarIcon />}
+                size="small"
+                onClick={() => navigate('/calendar')}
+              >
+                Calendar View
+              </Button>
+            </Box>
             <Divider sx={{ mb: 2 }} />
             <List>
               <ListItem divider>

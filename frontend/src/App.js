@@ -6,9 +6,13 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import EnhancedDashboardPage from './pages/EnhancedDashboardPage';
 import CustomersPage from './pages/CustomersPage';
 import CustomerDetailPage from './pages/CustomerDetailPage';
 import CustomerFormPage from './pages/CustomerFormPage';
+import UserManagementPage from './pages/UserManagementPage';
+import InteractionDetailPage from './pages/InteractionDetailPage';
+import CalendarPage from './pages/CalendarPage';
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Create theme
@@ -44,6 +48,8 @@ function App() {
             <Route path="/customers/new" element={<CustomerFormPage />} />
             <Route path="/customers/:id" element={<CustomerDetailPage />} />
             <Route path="/customers/edit/:id" element={<CustomerFormPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/interactions/:customerId" element={<InteractionDetailPage />} />
           </Route>
           
           {/* Home route */}
