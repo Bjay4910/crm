@@ -123,10 +123,11 @@ const CustomerList: React.FC = () => {
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search customers by name"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <SearchIcon aria-hidden="true" />
                 </InputAdornment>
               ),
             }}
@@ -136,6 +137,7 @@ const CustomerList: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={() => navigate('/customers/new')}
+            aria-label="Add new customer"
           >
             Add Customer
           </Button>
@@ -143,12 +145,15 @@ const CustomerList: React.FC = () => {
       </Box>
       
       <TableContainer component={Paper}>
-        <Table>
+        <Table aria-label="Customers table">
           <TableHead>
             <TableRow>
               <TableCell 
                 onClick={() => handleSort('name')}
                 sx={{ cursor: 'pointer' }}
+                aria-sort={sortBy === 'name' ? sortOrder : undefined}
+                role="columnheader"
+                aria-label={`Name, sort by ${sortBy === 'name' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   Name
@@ -159,6 +164,7 @@ const CustomerList: React.FC = () => {
                         ml: 0.5,
                         transform: sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
                       }}
+                      aria-hidden="true"
                     />
                   )}
                 </Box>
@@ -166,6 +172,9 @@ const CustomerList: React.FC = () => {
               <TableCell 
                 onClick={() => handleSort('email')}
                 sx={{ cursor: 'pointer' }}
+                aria-sort={sortBy === 'email' ? sortOrder : undefined}
+                role="columnheader"
+                aria-label={`Email, sort by ${sortBy === 'email' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   Email
@@ -176,14 +185,18 @@ const CustomerList: React.FC = () => {
                         ml: 0.5,
                         transform: sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
                       }}
+                      aria-hidden="true"
                     />
                   )}
                 </Box>
               </TableCell>
-              <TableCell>Phone</TableCell>
+              <TableCell role="columnheader">Phone</TableCell>
               <TableCell 
                 onClick={() => handleSort('company')}
                 sx={{ cursor: 'pointer' }}
+                aria-sort={sortBy === 'company' ? sortOrder : undefined}
+                role="columnheader"
+                aria-label={`Company, sort by ${sortBy === 'company' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   Company
@@ -194,6 +207,7 @@ const CustomerList: React.FC = () => {
                         ml: 0.5,
                         transform: sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
                       }}
+                      aria-hidden="true"
                     />
                   )}
                 </Box>
@@ -201,6 +215,9 @@ const CustomerList: React.FC = () => {
               <TableCell 
                 onClick={() => handleSort('status')}
                 sx={{ cursor: 'pointer' }}
+                aria-sort={sortBy === 'status' ? sortOrder : undefined}
+                role="columnheader"
+                aria-label={`Status, sort by ${sortBy === 'status' && sortOrder === 'asc' ? 'descending' : 'ascending'}`}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   Status
@@ -211,29 +228,30 @@ const CustomerList: React.FC = () => {
                         ml: 0.5,
                         transform: sortOrder === 'desc' ? 'rotate(180deg)' : 'none'
                       }}
+                      aria-hidden="true"
                     />
                   )}
                 </Box>
               </TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell align="right" role="columnheader">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  Loading...
+                  <Typography role="status" aria-live="polite">Loading customers...</Typography>
                 </TableCell>
               </TableRow>
             ) : customers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  No customers found
+                  <Typography role="status">No customers found</Typography>
                 </TableCell>
               </TableRow>
             ) : (
               customers.map((customer) => (
-                <TableRow key={customer.id}>
+                <TableRow key={customer.id} aria-label={`Customer: ${customer.name}`}>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
@@ -243,18 +261,21 @@ const CustomerList: React.FC = () => {
                       label={customer.status || 'active'}
                       color={getStatusColor(customer.status || 'active') as any}
                       size="small"
+                      role="status"
                     />
                   </TableCell>
                   <TableCell align="right">
                     <IconButton
                       size="small"
                       onClick={() => navigate(`/customers/${customer.id}`)}
+                      aria-label={`View details for ${customer.name}`}
                     >
                       <ViewIcon fontSize="small" />
                     </IconButton>
                     <IconButton
                       size="small"
                       onClick={() => navigate(`/customers/edit/${customer.id}`)}
+                      aria-label={`Edit ${customer.name}`}
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
@@ -262,6 +283,7 @@ const CustomerList: React.FC = () => {
                       <IconButton
                         size="small"
                         onClick={() => handleDelete(customer.id!)}
+                        aria-label={`Delete ${customer.name}`}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -282,6 +304,14 @@ const CustomerList: React.FC = () => {
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         rowsPerPageOptions={[5, 10, 25, 50]}
+        aria-label="Customer table pagination"
+        labelRowsPerPage="Customers per page:"
+        getItemAriaLabel={(type) => {
+          return type === 'first' ? 'Go to first page' :
+                 type === 'last' ? 'Go to last page' :
+                 type === 'next' ? 'Go to next page' :
+                 'Go to previous page';
+        }}
       />
     </Box>
   );

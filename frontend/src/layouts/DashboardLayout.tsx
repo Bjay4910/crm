@@ -16,16 +16,21 @@ import {
   Menu,
   MenuItem,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Tooltip
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   People as PeopleIcon,
   Menu as MenuIcon,
   ExitToApp as LogoutIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Home as HomeIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
+import KeyboardShortcutsHelp from '../components/KeyboardShortcutsHelp';
+import { useKeyboardNavigation } from '../utils/useKeyboardNavigation';
 
 const DRAWER_WIDTH = 240;
 
@@ -38,6 +43,9 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout } = useAuth();
+  
+  // Initialize keyboard navigation - this sets up the global shortcuts
+  useKeyboardNavigation();
   
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -58,6 +66,7 @@ const DashboardLayout: React.FC = () => {
   };
   
   const menuItems = [
+    { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Customers', icon: <PeopleIcon />, path: '/customers' }
   ];
@@ -117,6 +126,12 @@ const DashboardLayout: React.FC = () => {
             {location.pathname.includes('/dashboard') && 'Dashboard'}
             {location.pathname.includes('/customers') && 'Customers'}
           </Typography>
+          
+          {/* Theme Toggle Button */}
+          <ThemeToggle aria-label="Toggle dark/light mode" />
+          
+          {/* Keyboard Shortcuts Help */}
+          <KeyboardShortcutsHelp />
           
           {currentUser && (
             <div>

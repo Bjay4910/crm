@@ -109,7 +109,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
+    <Box sx={{ 
+      maxWidth: 800, 
+      mx: 'auto', 
+      p: { xs: 1, sm: 2 }, // Responsive padding
+      width: '100%' 
+    }}>
       <Typography variant="h5" component="h1" gutterBottom>
         {isEditing ? 'Edit Customer' : 'Add New Customer'}
       </Typography>
@@ -117,8 +122,16 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
       
-      <Box component="form" onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
+      <Box 
+        component="form" 
+        onSubmit={handleSubmit}
+        sx={{
+          '& .MuiTextField-root': {
+            mt: { xs: 1, sm: 0 } // Add spacing on mobile
+          }
+        }}
+      >
+        <Grid container spacing={{ xs: 1, sm: 2 }}> {/* Responsive spacing */}
           <Grid item xs={12}>
             <TextField
               name="name"
@@ -127,10 +140,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
               onChange={handleChange}
               fullWidth
               required
+              autoComplete="name"
+              inputProps={{
+                'aria-label': 'Customer name',
+              }}
             />
           </Grid>
           
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               name="email"
               label="Email"
@@ -138,30 +155,42 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
               value={formData.email || ''}
               onChange={handleChange}
               fullWidth
+              autoComplete="email"
+              inputProps={{
+                'aria-label': 'Customer email',
+              }}
             />
           </Grid>
           
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               name="phone"
               label="Phone"
               value={formData.phone || ''}
               onChange={handleChange}
               fullWidth
+              autoComplete="tel"
+              inputProps={{
+                'aria-label': 'Customer phone number',
+              }}
             />
           </Grid>
           
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               name="company"
               label="Company"
               value={formData.company || ''}
               onChange={handleChange}
               fullWidth
+              autoComplete="organization"
+              inputProps={{
+                'aria-label': 'Customer company',
+              }}
             />
           </Grid>
           
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               name="status"
               label="Status"
@@ -169,6 +198,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
               value={formData.status || 'active'}
               onChange={handleChange}
               fullWidth
+              inputProps={{
+                'aria-label': 'Customer status',
+              }}
             >
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="inactive">Inactive</MenuItem>
@@ -177,12 +209,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
             </TextField>
           </Grid>
           
-          <Grid item xs={12} sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Grid item xs={12} sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' }, // Stack buttons on mobile
+            gap: { xs: 1, sm: 2 }, 
+            mt: { xs: 2, sm: 3 } 
+          }}>
             <Button
               variant="contained"
               color="primary"
               type="submit"
               disabled={loading}
+              fullWidth={true}
+              aria-label={loading ? 'Saving customer data' : 'Save customer data'}
+              sx={{ flex: { sm: 1 } }}
             >
               {loading ? 'Saving...' : 'Save Customer'}
             </Button>
@@ -190,6 +230,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ isEditing = false }) => {
             <Button
               variant="outlined"
               onClick={() => navigate('/customers')}
+              fullWidth={true}
+              aria-label="Cancel and return to customers list"
+              sx={{ flex: { sm: 1 } }}
             >
               Cancel
             </Button>

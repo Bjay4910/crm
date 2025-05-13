@@ -22,7 +22,7 @@ export const generateAccessToken = (userId: number, role: string): string => {
   return jwt.sign(
     { userId, role, type: 'access' },
     JWT_ACCESS_SECRET,
-    { expiresIn: JWT_ACCESS_EXPIRATION }
+    { expiresIn: JWT_ACCESS_EXPIRATION } as jwt.SignOptions
   );
 };
 
@@ -34,7 +34,7 @@ export const generateRefreshToken = (userId: number, tokenFamily?: string): { to
   const token = jwt.sign(
     { userId, type: 'refresh', family },
     JWT_REFRESH_SECRET,
-    { expiresIn: JWT_REFRESH_EXPIRATION }
+    { expiresIn: JWT_REFRESH_EXPIRATION } as jwt.SignOptions
   );
   
   // Store refresh token info

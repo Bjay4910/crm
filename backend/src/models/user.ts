@@ -72,6 +72,12 @@ export async function findUserById(id: number): Promise<UserResponse | null> {
   }
 }
 
-export async function validatePassword(user: User, password: string): Promise<boolean> {
+export async function validatePassword(user: User | UserResponse, password: string): Promise<boolean> {
+  // If we have a UserResponse, we need to get the full User with password
+  if (!('password' in user)) {
+    const fullUser = await findUserByEmail(user.email);
+    if (!fullUser) return false;
+    return bcrypt.compare(password, fullUser.password);
+  }
   return bcrypt.compare(password, user.password);
 }
