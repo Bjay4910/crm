@@ -96,6 +96,7 @@ npm run start:frontend
 ### Customers
 - `GET /api/customers` - Get all customers
 - `GET /api/customers/:id` - Get customer by ID
+- `GET /api/customers/:name` - Get customer by Name
 - `POST /api/customers` - Create customer
 - `PUT /api/customers/:id` - Update customer
 - `DELETE /api/customers/:id` - Delete customer (admin only)
