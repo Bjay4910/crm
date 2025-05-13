@@ -1,72 +1,74 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { User, getCurrentUser, logout } from '../services/authService';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useAuth as useAuthHook } from '../hooks/useAuth';
+import { User } from '../services/authService';
 
+// Define the auth context type
 interface AuthContextType {
-  currentUser: User | null;
+  user: User | undefined;
   isAuthenticated: boolean;
-  loading: boolean;
-  login: (user: User, token: string) => void;
-  logout: () => void;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  logoutAllDevices: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType>({
-  currentUser: null,
-  isAuthenticated: false,
-  loading: true,
-  login: () => {},
-  logout: () => {}
-});
+// Create the auth context
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Props for the auth provider component
 interface AuthProviderProps {
   children: ReactNode;
 }
 
+// Auth provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Use our custom hook that leverages React Query
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    login,
+    register,
+    logout,
+    logoutAllDevices,
+    changePassword
+  } = useAuthHook();
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const userInfo = getCurrentUser();
-    if (userInfo) {
-      setCurrentUser(userInfo.user);
-      setIsAuthenticated(true);
+  // Create the auth value object for the context
+  const authValue: AuthContextType = {
+    user,
+    isAuthenticated,
+    isLoading,
+    login: async (email, password) => {
+      await login({ email, password });
+    },
+    register: async (username, email, password) => {
+      await register({ username, email, password });
+    },
+    logout: async () => {
+      await logout();
+    },
+    logoutAllDevices: async () => {
+      await logoutAllDevices();
+    },
+    changePassword: async (currentPassword, newPassword) => {
+      await changePassword({ currentPassword, newPassword });
     }
-    setLoading(false);
-  }, []);
-
-  const handleLogin = (user: User, token: string) => {
-    localStorage.setItem('user', JSON.stringify({ user, token }));
-    setCurrentUser(user);
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    logout();
-    setCurrentUser(null);
-    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        isAuthenticated,
-        loading,
-        login: handleLogin,
-        logout: handleLogout
-      }}
-    >
+    <AuthContext.Provider value={authValue}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 // Custom hook to use the auth context
-export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (!context) {
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
