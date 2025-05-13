@@ -22,6 +22,10 @@ dist/
 .env.test.local
 .env.production.local
 
+# SSH
+sshfile
+sshfile.pub
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
