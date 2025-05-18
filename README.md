@@ -7,7 +7,12 @@ A full-featured Customer Relationship Management (CRM) system with a React front
 - Enhanced security with JWT access and refresh tokens
 - Customer management with filters and sorting
 - Interaction tracking and history
-- Interactive dashboard with key metrics
+- Interactive dashboard with key metrics and data visualizations
+- Personalized time-based greetings (morning/afternoon/evening)
+- Quick action buttons for common tasks
+- Notification center with priority indicators
+- Global search functionality
+- Sleek animations and transitions throughout the interface
 - Role-based access control
 - Dark/light mode with system preference detection
 - Full keyboard navigation support
@@ -22,9 +27,11 @@ A full-featured Customer Relationship Management (CRM) system with a React front
 - Material UI components with theme customization
 - React Router for navigation
 - React Query for state management and data fetching
+- Recharts for interactive data visualizations
 - Vitest for unit testing
 - Context API for global state
 - Accessibility-focused design with ARIA attributes
+- Custom animation effects using CSS transitions
 
 ### Backend
 - Express.js with TypeScript
@@ -55,6 +62,19 @@ A full-featured Customer Relationship Management (CRM) system with a React front
         ├── models/         # Data models
         └── routes/         # API routes
 ```
+
+## UI Enhancements
+
+The latest update includes significant UI improvements:
+
+- **Data Visualizations**: Interactive pie chart showing customer distribution and bar graph displaying leads by source
+- **Personalized Greeting**: Dynamic greeting that changes based on the time of day
+- **Quick-Actions Section**: Convenient buttons for frequently used operations
+- **Notification Center**: Alerts for urgent tasks with visual indicators
+- **Global Search**: Easily find customers, interactions, or leads from anywhere
+- **Smooth Animations**: Gentle fade-ins, hover effects, and transitions between sections
+- **Custom Branding**: Updated navigation icons and personalized avatar
+- **Responsive Cards**: Interactive elements with hover and focus effects
 
 ## Getting Started
 
@@ -94,7 +114,7 @@ npm run start:backend
 npm run start:frontend
 ```
 
-- Frontend runs at: http://localhost:3000
+- Frontend runs at: http://localhost:3001
 - Backend API runs at: http://localhost:8000
 - API Documentation runs at: http://localhost:8000/api-docs
 
@@ -154,6 +174,15 @@ The application supports keyboard navigation for power users:
 - Enhanced focus styles for keyboard navigation
 - Responsive design for all screen sizes
 - Screen reader compatible components
+
+## Deployment
+
+This application can be deployed in various ways:
+
+- **GitHub Pages**: For static frontend deployment
+- **Heroku**: For full-stack deployment
+- **Vercel**: For frontend-only deployment
+- **AWS/GCP/Azure**: For production-grade deployment
 
 ## License
 

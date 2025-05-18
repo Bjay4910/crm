@@ -1,0 +1,43 @@
+<\!DOCTYPE html>
+<html>
+<head>
+  <title>Auto Login to CRM</title>
+  <script>
+    async function autoLogin() {
+      try {
+        const response = await fetch('http://localhost:8000/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: 'testuser@example.com',
+            password: 'password123'
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store token in localStorage (what the app would normally do)
+          localStorage.setItem('token', data.data.accessToken);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          
+          // Redirect to dashboard
+          window.location.href = 'http://localhost:3001/dashboard';
+        } else {
+          document.getElementById('status').innerText = 'Login failed: ' + JSON.stringify(data);
+        }
+      } catch (error) {
+        document.getElementById('status').innerText = 'Error: ' + error.message;
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Auto Login to CRM Dashboard</h1>
+  <p>This page will automatically log you in and redirect to the dashboard.</p>
+  <button onclick="autoLogin()">Login and Go to Dashboard</button>
+  <div id="status"></div>
+</body>
+</html>

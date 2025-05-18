@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -17,7 +17,9 @@ import {
   MenuItem,
   useTheme,
   useMediaQuery,
-  Tooltip
+  Tooltip,
+  Badge,
+  Fade
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -25,7 +27,10 @@ import {
   Menu as MenuIcon,
   ExitToApp as LogoutIcon,
   Person as PersonIcon,
-  Home as HomeIcon
+  Home as HomeIcon,
+  CalendarToday as CalendarIcon,
+  Notifications as NotificationIcon,
+  Speed as SpeedIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
@@ -39,6 +44,7 @@ const DashboardLayout: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [avatarType, setAvatarType] = useState<'initials' | 'logo'>('logo');
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,6 +52,16 @@ const DashboardLayout: React.FC = () => {
   
   // Initialize keyboard navigation - this sets up the global shortcuts
   useKeyboardNavigation();
+  
+  useEffect(() => {
+    // In a real app, you might fetch the user's avatar preferences from the backend
+    const getUserPreferences = () => {
+      // For demonstration, we'll use the logo by default
+      setAvatarType('logo');
+    };
+    
+    getUserPreferences();
+  }, []);
   
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -65,39 +81,161 @@ const DashboardLayout: React.FC = () => {
     handleProfileMenuClose();
   };
   
+  // Enhanced menu items with better icons and animations
   const menuItems = [
-    { text: 'Home', icon: <HomeIcon />, path: '/' },
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Customers', icon: <PeopleIcon />, path: '/customers' }
+    { 
+      text: 'Home', 
+      icon: <HomeIcon sx={{ transition: 'color 0.2s' }} />, 
+      path: '/' 
+    },
+    { 
+      text: 'Dashboard', 
+      icon: <SpeedIcon sx={{ transition: 'color 0.2s' }} />, 
+      path: '/dashboard' 
+    },
+    { 
+      text: 'Customers', 
+      icon: <PeopleIcon sx={{ transition: 'color 0.2s' }} />, 
+      path: '/customers' 
+    },
+    { 
+      text: 'Calendar', 
+      icon: <CalendarIcon sx={{ transition: 'color 0.2s' }} />, 
+      path: '/calendar' 
+    }
   ];
+  
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (!currentUser?.username) return 'U';
+    
+    const nameParts = currentUser.username.split(' ');
+    if (nameParts.length > 1) {
+      return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
+    }
+    return currentUser.username[0].toUpperCase();
+  };
+  
+  // Generate avatar component based on type
+  const getAvatarComponent = () => {
+    if (avatarType === 'logo') {
+      return (
+        <Avatar 
+          sx={{ 
+            width: 32, 
+            height: 32, 
+            bgcolor: 'primary.main',
+            transition: 'transform 0.3s',
+            '&:hover': { transform: 'scale(1.1)' }
+          }}
+          alt="Company Logo"
+        >
+          <span style={{ 
+            fontFamily: '"Montserrat", sans-serif', 
+            fontWeight: 'bold', 
+            fontSize: '16px' 
+          }}>
+            BJ
+          </span>
+        </Avatar>
+      );
+    }
+    
+    return (
+      <Avatar 
+        sx={{ 
+          width: 32, 
+          height: 32, 
+          bgcolor: 'secondary.main',
+          transition: 'transform 0.3s',
+          '&:hover': { transform: 'scale(1.1)' }
+        }}
+      >
+        {getUserInitials()}
+      </Avatar>
+    );
+  };
   
   const drawer = (
     <div>
       <Toolbar sx={{ justifyContent: 'center' }}>
-        <Typography variant="h6" noWrap>
-          CRM System
-        </Typography>
+        <Fade in={true} timeout={1000}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar 
+              src="/logo192.png"
+              alt="CRM Logo"
+              sx={{ 
+                width: 40, 
+                height: 40, 
+                mr: 1,
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'rotate(10deg)' }
+              }}
+            />
+            <Typography 
+              variant="h6" 
+              noWrap
+              sx={{
+                background: 'linear-gradient(45deg, #1976d2 30%, #2196f3 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 'bold'
+              }}
+            >
+              CRM System
+            </Typography>
+          </Box>
+        </Fade>
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem 
-            button 
-            key={item.text} 
-            onClick={() => navigate(item.path)}
-            selected={location.pathname === item.path}
-            sx={{
-              '&.Mui-selected': {
-                backgroundColor: 'primary.light',
-                '&:hover': {
-                  backgroundColor: 'primary.light',
-                },
-              },
-            }}
+        {menuItems.map((item, index) => (
+          <Fade 
+            in={true} 
+            timeout={500} 
+            style={{ transitionDelay: `${index * 100}ms` }}
+            key={item.text}
           >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItem>
+            <ListItem 
+              button 
+              onClick={() => {
+                navigate(item.path);
+                if (isMobile) setMobileOpen(false);
+              }}
+              selected={location.pathname === item.path}
+              sx={{
+                transition: 'background-color 0.3s, transform 0.2s',
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.light',
+                  borderRight: `4px solid ${theme.palette.primary.main}`,
+                  '&:hover': {
+                    backgroundColor: 'primary.light',
+                  },
+                },
+                '&:hover': {
+                  transform: 'translateX(4px)',
+                },
+              }}
+            >
+              <ListItemIcon 
+                sx={{ 
+                  color: location.pathname === item.path 
+                    ? 'primary.main' 
+                    : 'inherit',
+                  transition: 'color 0.3s'
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{
+                  fontWeight: location.pathname === item.path ? 'bold' : 'regular',
+                  transition: 'font-weight 0.3s'
+                }}
+              />
+            </ListItem>
+          </Fade>
         ))}
       </List>
     </div>
@@ -109,7 +247,8 @@ const DashboardLayout: React.FC = () => {
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          ml: { sm: `${DRAWER_WIDTH}px` }
+          ml: { sm: `${DRAWER_WIDTH}px` },
+          transition: 'width 0.3s, margin-left 0.3s'
         }}
       >
         <Toolbar>
@@ -118,14 +257,36 @@ const DashboardLayout: React.FC = () => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ 
+              mr: 2, 
+              display: { sm: 'none' },
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'rotate(180deg)' }
+            }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {location.pathname.includes('/dashboard') && 'Dashboard'}
             {location.pathname.includes('/customers') && 'Customers'}
+            {location.pathname.includes('/calendar') && 'Calendar'}
           </Typography>
+          
+          {/* Notifications */}
+          <Tooltip title="Notifications">
+            <IconButton 
+              color="inherit"
+              sx={{ 
+                mr: 1,
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'scale(1.1)' }
+              }}
+            >
+              <Badge color="error" badgeContent={3}>
+                <NotificationIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
           
           {/* Theme Toggle Button */}
           <ThemeToggle aria-label="Toggle dark/light mode" />
@@ -135,17 +296,18 @@ const DashboardLayout: React.FC = () => {
           
           {currentUser && (
             <div>
-              <IconButton
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
-                  {currentUser.username ? currentUser.username[0].toUpperCase() : 'U'}
-                </Avatar>
-              </IconButton>
+              <Tooltip title="Account settings">
+                <IconButton
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                  sx={{ ml: 1 }}
+                >
+                  {getAvatarComponent()}
+                </IconButton>
+              </Tooltip>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
@@ -160,6 +322,13 @@ const DashboardLayout: React.FC = () => {
                 }}
                 open={Boolean(anchorEl)}
                 onClose={handleProfileMenuClose}
+                sx={{ 
+                  '& .MuiPaper-root': {
+                    borderRadius: 2,
+                    mt: 1.5,
+                    boxShadow: 3
+                  }
+                }}
               >
                 <MenuItem disabled>
                   <Typography variant="body2">
@@ -167,13 +336,25 @@ const DashboardLayout: React.FC = () => {
                   </Typography>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleProfileMenuClose}>
+                <MenuItem 
+                  onClick={handleProfileMenuClose}
+                  sx={{ 
+                    transition: 'background-color 0.2s',
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}
+                >
                   <ListItemIcon>
                     <PersonIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText>Profile</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleLogout}>
+                <MenuItem 
+                  onClick={handleLogout}
+                  sx={{ 
+                    transition: 'background-color 0.2s',
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}
+                >
                   <ListItemIcon>
                     <LogoutIcon fontSize="small" />
                   </ListItemIcon>
@@ -198,7 +379,11 @@ const DashboardLayout: React.FC = () => {
           }}
           sx={{
             display: { xs: 'block', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH }
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: DRAWER_WIDTH,
+              boxShadow: 1
+            }
           }}
         >
           {drawer}
@@ -211,7 +396,8 @@ const DashboardLayout: React.FC = () => {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
-          mt: { xs: 8, sm: 8 }
+          mt: { xs: 8, sm: 8 },
+          transition: 'width 0.3s'
         }}
       >
         <Outlet />
